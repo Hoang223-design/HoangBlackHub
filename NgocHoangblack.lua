@@ -2,7 +2,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Hoang223-design/GuiH
 
 local Window = MakeWindow({
     Hub = {
-        Title = "HoàngBlackHub:!Tạm thời free ko phải lấy key nhưng sau này sẽ có!",
+        Title = "HoàngBlackHub Beta v0.2",
         Animation = "Cre: NgọcHoàng20?👑"
     },
     Key = {
@@ -21,26 +21,30 @@ local Window = MakeWindow({
 })
 
 MinimizeButton({
-    Image = "http://www.roblox.com/asset/?id=140429082889096",
-    Size = {27, 27},
+    Image = "http://www.roblox.com/asset/?id=93018818295521",
+    Size = {40, 40},
     Color = Color3.fromRGB(10, 10, 10),
     Corner = true,
     Stroke = false,
     StrokeColor = Color3.fromRGB(255, 0, 0)
 })
 
------- Tab
 local Tab1o = MakeTab({Name = "Nhạc🥁🎷"})
 local Tab2o = MakeTab({Name = "Main👉🏻👈🏻"})
 local Tab3o = MakeTab({Name = "Trái cây/raid🤤🍑"})
 local Tab4o = MakeTab({Name = "Pvp🥵"})
 local Tab5o = MakeTab({Name = "Khác☘️"})
-local Tab6o = MakeTab({Name = "lỗi !!🐢"})
-local Tab7o = MakeTab({Name = "Dịch Chuyển🛸"})
+local Tab6o = MakeTab({Name = "Dịch Chuyển🛸"})
+local Tab7o = MakeTab({Name = "Server🌐"})
 
-------- BUTTON
+-- Biến toàn cục
 local currentSound = nil
+local flying = false
+local flySpeed = 175
+local flyHeight = 75
+local bodyVelocity, bodyGyro
 
+-- Tab Nhạc (giữ nguyên)
 AddToggle(Tab1o, {
     Name = "Chipi chipi chapa🐱",
     Default = false,
@@ -97,13 +101,13 @@ AddToggle(Tab1o, {
     end
 })
 
--- Tab2o chỉ giữ các button
+-- Tab Main (giữ nguyên)
 AddButton(Tab2o, {
     Name = "🩸z",
     Callback = function()
         local Settings = {
-            JoinTeam = "Pirates";
-            Translator = true;
+            JoinTeam = "Pirates",
+            Translator = true
         }
         loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))(Settings)
     end
@@ -140,6 +144,7 @@ AddButton(Tab2o, {
     end
 })
 
+-- Tab Trái cây/Raid (giữ nguyên)
 AddButton(Tab3o, {
     Name = "auto Nhặt 🍑🤤",
     Callback = function()
@@ -147,12 +152,14 @@ AddButton(Tab3o, {
     end
 })
 
+-- Tab PvP (giữ nguyên)
 AddButton(Tab4o, {
     Name = "sắp có😍 !!",
     Callback = function()
     end
 })
 
+-- Tab Khác (giữ nguyên)
 AddButton(Tab5o, {
     Name = "dành cho máy yếu💥 x3",
     Callback = function()
@@ -160,120 +167,7 @@ AddButton(Tab5o, {
     end
 })
 
-AddButton(Tab6o, {
-    Name = "Kaitun simple",
-    Callback = function()
-        getgenv().simple_settings = {
-            ["MASTERY"] = {
-                ["ACTIVE"] = true,
-                ["METHOD"] = "Half",
-            },
-            ["OBJECTIVE"] = {
-                ["GODHUMAN"] = true,
-                ["RACE-V3"] = true,
-                ["FRAGMENT"] = 100000,
-                ["CANVANDER"] = true,
-                ["BUDDY-SWORD"] = true,
-                ["CURSED-DUAL-KATANA"] = true,
-                ["SHARK-ANCHOR"] = true,
-                ["ACIDUM-RIFLE"] = true,
-                ["VENOM-BOW"] = true,
-                ["SOUL-GUITAR"] = true,
-            },
-            ["FRUITPURCHASE"] = true,
-            ["PRIORITYFRUIT"] = {
-                [1] = "Dragon-Dragon",
-                [2] = "Flame-Flame",
-                [3] = "Rumble-Rumble",
-                [4] = "Human-Human: Buddha",
-                [5] = "Dark-Dark",
-            },
-            ["FPSCAP"] = 30,
-            ["LOWTEXTURE"] = true
-        }
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/simple-hubs/contents/refs/heads/main/bloxfruit-kaitan-main.lua"))()
-    end
-})
-
--- Tab7: Bay đến đảo và Dịch chuyển thông minh
-local flySpeed = 175 -- Tốc độ bay
-local flyHeight = 75 -- Độ cao bay
-local flying = false
-local bodyVelocity, bodyGyro
-
-local function startFly(targetCFrame)
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-    
-    local rootPart = character.HumanoidRootPart
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyGyro = Instance.new("BodyGyro")
-    
-    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-    bodyVelocity.Parent = rootPart
-    
-    bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-    bodyGyro.Parent = rootPart
-    
-    flying = true
-    
-    spawn(function()
-        local startPos = rootPart.Position
-        local endPos = targetCFrame.Position + Vector3.new(0, flyHeight, 0) -- Bay cao hơn
-        
-        while flying do
-            local currentPos = rootPart.Position
-            local distanceToTarget = (currentPos - endPos).Magnitude
-            
-            -- Dừng lại khi gần đích (khoảng cách < 3)
-            if distanceToTarget < 2 then
-                rootPart.CFrame = CFrame.new(endPos, targetCFrame.Position)
-                stopFly()
-                break
-            end
-            
-            -- Điều chỉnh tốc độ khi gần đích
-            local adjustedSpeed = flySpeed
-            if distanceToTarget < 50 then
-                adjustedSpeed = math.max(flySpeed * (distanceToTarget / 50), 10) -- Giảm tốc độ dần
-            end
-            
-            -- Di chuyển về đích
-            local direction = (endPos - currentPos).Unit
-            bodyVelocity.Velocity = direction * adjustedSpeed
-            bodyGyro.CFrame = CFrame.lookAt(currentPos, endPos)
-            
-            wait(0.03) -- Tăng tần suất cập nhật để chính xác hơn
-        end
-    end)
-end
-
-local function stopFly()
-    flying = false
-    if bodyVelocity then bodyVelocity:Destroy() end
-    if bodyGyro then bodyGyro:Destroy() end
-end
-
-local function TeleportTo(pos)
-    local player = game.Players.LocalPlayer
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = pos
-    end
-end
-
-local function GetCurrentSea()
-    local player = game.Players.LocalPlayer
-    local level = player.Data.Level.Value
-    if level < 700 then
-        return 1 -- Sea 1
-    elseif level < 1500 then
-        return 2 -- Sea 2
-    else
-        return 3 -- Sea 3
-    end
-end
-
+-- Tab Dịch Chuyển
 local Sea1Locations = {
     {"Windmill Village", CFrame.new(979, 16, 1200)},
     {"Marine Start", CFrame.new(-2570, 6, 2050)},
@@ -316,12 +210,81 @@ local Sea3Locations = {
     {"Tiki Outpost", CFrame.new(-16500, 10, 1000)}
 }
 
+local function startFly(targetCFrame)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local rootPart = character.HumanoidRootPart
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyGyro = Instance.new("BodyGyro")
+    
+    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+    bodyVelocity.Parent = rootPart
+    
+    bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+    bodyGyro.Parent = rootPart
+    
+    flying = true
+    
+    spawn(function()
+        local startPos = rootPart.Position
+        local endPos = targetCFrame.Position + Vector3.new(0, flyHeight, 0)
+        
+        while flying do
+            local currentPos = rootPart.Position
+            local distanceToTarget = (currentPos - endPos).Magnitude
+            
+            if distanceToTarget < 2 then
+                rootPart.CFrame = CFrame.new(endPos, targetCFrame.Position)
+                stopFly()
+                break
+            end
+            
+            local adjustedSpeed = flySpeed
+            if distanceToTarget < 50 then
+                adjustedSpeed = math.max(flySpeed * (distanceToTarget / 50), 10)
+            end
+            
+            local direction = (endPos - currentPos).Unit
+            bodyVelocity.Velocity = direction * adjustedSpeed
+            bodyGyro.CFrame = CFrame.lookAt(currentPos, endPos)
+            
+            wait(0.03)
+        end
+    end)
+end
+
+local function stopFly()
+    flying = false
+    if bodyVelocity then bodyVelocity:Destroy() end
+    if bodyGyro then bodyGyro:Destroy() end
+end
+
+local function TeleportTo(pos)
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = pos
+    end
+end
+
+local function GetCurrentSea()
+    local player = game.Players.LocalPlayer
+    local level = player.Data.Level.Value
+    if level < 700 then
+        return 1
+    elseif level < 1500 then
+        return 2
+    else
+        return 3
+    end
+end
+
 local function SmartTeleport(targetCFrame)
     local player = game.Players.LocalPlayer
     local currentSea = GetCurrentSea()
     local targetSea = nil
     
-    -- Xác định Sea của đích đến
     for _, loc in pairs(Sea1Locations) do
         if loc[2] == targetCFrame then targetSea = 1 break end
     end
@@ -333,19 +296,33 @@ local function SmartTeleport(targetCFrame)
     end
     
     if targetSea and currentSea ~= targetSea then
-        -- Dịch chuyển qua cổng ở Sea 3
         if currentSea == 3 or targetSea == 3 then
-            local portalPos = CFrame.new(-5000, 314, -3000) -- Castle on the Sea (cổng chính)
-            TeleportTo(portalPos)
-            wait(1) -- Đợi để qua cổng
+            TeleportTo(CFrame.new(-5000, 314, -3000)) -- Đi đến Castle on the Sea
+            wait(1)
         end
     end
     
-    -- Bay đến đích
     startFly(targetCFrame)
 end
 
-AddDropdown(Tab7o, {
+-- Sửa lại teleport giữa các Sea bằng Remote
+local function TravelToSea(targetSea)
+    local success = false
+    pcall(function()
+        if targetSea == 1 then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelMain")
+        elseif targetSea == 2 then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelDressrosa")
+        elseif targetSea == 3 then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelZou")
+        end
+        wait(2) -- Chờ game xử lý dịch chuyển
+        success = true
+    end)
+    return success
+end
+
+AddDropdown(Tab6o, {
     Name = "Chọn đảo cần tới🏞️",
     Default = "Chọn đảo🏜️",
     Options = (function()
@@ -381,7 +358,7 @@ AddDropdown(Tab7o, {
     end
 })
 
-AddButton(Tab7o, {
+AddButton(Tab6o, {
     Name = "Dừng Tele🐧",
     Callback = function()
         if flying then
@@ -401,57 +378,152 @@ AddButton(Tab7o, {
     end
 })
 
-AddButton(Tab7o, {
+AddButton(Tab6o, {
     Name = "🌲🌲Sea 1🛸",
     Callback = function()
-        local currentSea = GetCurrentSea()
-        if currentSea ~= 1 then
-            if currentSea == 3 then
-                TeleportTo(CFrame.new(-5000, 314, -3000)) -- Castle on the Sea
-                wait(1)
-            end
-            TeleportTo(CFrame.new(979, 16, 1200)) -- Windmill Village
+        if TravelToSea(1) then
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Đã dịch chuyển đến Sea 1!",
+                Duration = 5
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Không thể dịch chuyển đến Sea 1!",
+                Duration = 5
+            })
         end
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Thông báo🔊!",
-            Text = "Đang dịch chuyển đến Sea 1!",
-            Duration = 5
-        })
     end
 })
 
-AddButton(Tab7o, {
+AddButton(Tab6o, {
     Name = "🌲☕Sea 2🛸",
     Callback = function()
-        local currentSea = GetCurrentSea()
-        if currentSea ~= 2 then
-            if currentSea == 3 then
-                TeleportTo(CFrame.new(-5000, 314, -3000)) -- Castle on the Sea
-                wait(1)
-            end
-            TeleportTo(CFrame.new(-380, 77, 255)) -- Cafe
+        if TravelToSea(2) then
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Đã dịch chuyển đến Sea 2!",
+                Duration = 5
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Không thể dịch chuyển đến Sea 2!",
+                Duration = 5
+            })
         end
+    end
+})
+
+AddButton(Tab6o, {
+    Name = "🐢Sea 3🛸",
+    Callback = function()
+        if TravelToSea(3) then
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Đã dịch chuyển đến Sea 3!",
+                Duration = 5
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Không thể dịch chuyển đến Sea 3!",
+                Duration = 5
+            })
+        end
+    end
+})
+
+-- Tab Server
+local function RejoinServer()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Thông báo🔊!",
+        Text = "Đang tham gia lại server...",
+        Duration = 5
+    })
+end
+
+local function HopServer()
+    local success, error = pcall(function()
+        local servers = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        for _, server in pairs(servers.data) do
+            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, server.id, game.Players.LocalPlayer)
+                break
+            end
+        end
+    end)
+    if success then
         game.StarterGui:SetCore("SendNotification", {
             Title = "Thông báo🔊!",
-            Text = "Đang dịch chuyển đến Sea 2!",
+            Text = "Đang chuyển sang server mới...",
             Duration = 5
         })
+    else
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Thông báo🔊!",
+            Text = "Không tìm thấy server mới!",
+            Duration = 5
+        })
+    end
+end
+
+local function FindLowPlayerServer()
+    local success, error = pcall(function()
+        local servers = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        local lowestPlayers = math.huge
+        local targetServer = nil
+        
+        for _, server in pairs(servers.data) do
+            if server.playing < lowestPlayers and server.id ~= game.JobId then
+                lowestPlayers = server.playing
+                targetServer = server.id
+            end
+        end
+        
+        if targetServer then
+            game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, targetServer, game.Players.LocalPlayer)
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Đang chuyển đến server ít người (" .. lowestPlayers .. " người)...",
+                Duration = 5
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Thông báo🔊!",
+                Text = "Không tìm thấy server ít người!",
+                Duration = 5
+            })
+        end
+    end)
+    if not success then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Thông báo🔊!",
+            Text = "Lỗi khi tìm server: " .. tostring(error),
+            Duration = 5
+        })
+    end
+end
+
+AddButton(Tab7o, {
+    Name = "🔄 Rejoin Server",
+    Callback = function()
+        RejoinServer()
     end
 })
 
 AddButton(Tab7o, {
-    Name = "🐢Sea 3🛸",
+    Name = "🌍 Chuyển đổi server",
     Callback = function()
-        local currentSea = GetCurrentSea()
-        if currentSea ~= 3 then
-            TeleportTo(CFrame.new(-5000, 314, -3000)) -- Castle on the Sea
-            wait(1)
-        end
-        TeleportTo(CFrame.new(-950, 15, 5500)) -- Port Town
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Thông báo🔊!",
-            Text = "Đang dịch chuyển đến Sea 3!",
-            Duration = 5
-        })
+        HopServer()
+    end
+})
+
+AddButton(Tab7o, {
+    Name = "👥 Tìm Server Ít Người",
+    Callback = function()
+        FindLowPlayerServer()
     end
 })
