@@ -2,7 +2,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Hoang223-design/GuiH
 
 local Window = MakeWindow({
     Hub = {
-        Title = "HoàngBlackHub Beta v0.2",
+        Title = "HoàngBlackHub Beta v0.2 ( permium admin script )",
         Animation = "Cre: NgọcHoàng20?👑"
     },
     Key = {
